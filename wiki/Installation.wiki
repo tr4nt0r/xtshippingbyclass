@@ -1,0 +1,69 @@
+#summary Versandmodul nach Versandklassen für xt:Commerce 3.0.4 SP 2.1 - Installation
+#labels installation
+= Einleitung =
+
+Diese Seite beschreibt die Installation des Moduls anhand eines unmodifizierten xt:Commerce 3.0.4 SP 2.1. Für modifizierte Shopsysteme oder xt:Commerce Forks ist ggf. zusätzliche Anpassung erforderlich
+
+
+= Installation =
+
+== Modul einspielen ==
+Ordner includes und lang in den Root-Ordner des Shops hochladen.
+Die Datei includes/modules/shipping/shippingclass.php bearbeiten und am Anfang bei
+`$this->num_classes` die Anzahl benötigter Versandklassen definieren.
+
+Anschließend über den Adminbereich unter _Module > Versandart_ das Modul Versand nach Versandklassen installieren, es wird automatisch in
+der Tabelle products in der Datenbank die Spalte products_shippingclass ergänzt.
+
+== Anpassung von Dateien ==
+
+Datei */admin/includes/modules/new_product.php* (Zeile 49)
+{{{
+$products_startpage_sort = $_POST['products_startpage_sort'];
+}}}
+Danach folgendes einfügen:
+{{{
+   /*********************************************************/
+   //Anpassung Modul Versandkosten nach Versandklassen
+   $products_shippingclass = $_POST['products_shippingclass'];
+   /*********************************************************/
+}}}
+
+Zeile 212-215:
+{{{
+echo '<td><span class="main">'.xtc_draw_pull_down_menu('options_template', $files, $default_value);
+?>
+        </span></td>
+      </tr>
+}}}
+Danach folgendes einfügen:
+{{{
+<?php
+/******************************************/
+//Anpassung Modul Versand nach Versandklasse
+$products_shippingclass_array = array(array ('id' => '', 'text' => TEXT_SELECT));
+
+$products_shippingclass_query = xtc_db_query ('SELECT * FROM ' .TABLE_CONFIGURATION . ' WHERE configuration_key like "MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_%" ORDER BY configuration_value');
+while( $products_shippingclass = xtc_db_fetch_array ($products_shippingclass_query)) {
+	$products_shippingclass_array[] = array('id' => str_replace('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_', '', $products_shippingclass['configuration_key']), 'text' => $products_shippingclass['configuration_value']);
+}
+
+
+
+?>      
+     <tr>
+        <td class="main">Versandklasse</td>
+        <td><span class="main"><?php echo xtc_draw_pull_down_menu('products_shippingclass', $products_shippingclass_array, $pInfo->products_shippingclass); ?></span></td>
+      </tr>
+}}}
+
+
+
+Datei */admin/includes/classes/categories.php* (Zeile 502)
+{{{
+$sql_data_array = array ('products_quantity' => xtc_db_prepare_input($products_data['products_quantity']), 'products_model' => xtc_db_prepare_input($products_data['products_model']), 'products_ean' => xtc_db_prepare_input($products_data['products_ean']), 'products_price' => xtc_db_prepare_input($products_data['products_price']), 'products_sort' => xtc_db_prepare_input($products_data['products_sort']), 'products_shippingtime' => xtc_db_prepare_input($products_data['shipping_status']), 'products_discount_allowed' => xtc_db_prepare_input($products_data['products_discount_allowed']), 'products_date_available' => $products_date_available, 'products_weight' => xtc_db_prepare_input($products_data['products_weight']), 'products_status' => $products_status, 'products_startpage' => xtc_db_prepare_input($products_data['products_startpage']), 'products_startpage_sort' => xtc_db_prepare_input($products_data['products_startpage_sort']), 'products_tax_class_id' => xtc_db_prepare_input($products_data['products_tax_class_id']), 'product_template' => xtc_db_prepare_input($products_data['info_template']), 'options_template' => xtc_db_prepare_input($products_data['options_template']), 'manufacturers_id' => xtc_db_prepare_input($products_data['manufacturers_id']), 'products_fsk18' => xtc_db_prepare_input($products_data['fsk18']), 'products_vpe_value' => xtc_db_prepare_input($products_data['products_vpe_value']), 'products_vpe_status' => xtc_db_prepare_input($products_data['products_vpe_status']), 'products_vpe' => xtc_db_prepare_input($products_data['products_vpe']));
+}}}
+Ändern in:
+{{{
+$sql_data_array = array ('products_quantity' => xtc_db_prepare_input($products_data['products_quantity']), 'products_model' => xtc_db_prepare_input($products_data['products_model']), 'products_ean' => xtc_db_prepare_input($products_data['products_ean']), 'products_price' => xtc_db_prepare_input($products_data['products_price']), 'products_sort' => xtc_db_prepare_input($products_data['products_sort']), 'products_shippingtime' => xtc_db_prepare_input($products_data['shipping_status']), 'products_discount_allowed' => xtc_db_prepare_input($products_data['products_discount_allowed']), 'products_date_available' => $products_date_available, 'products_weight' => xtc_db_prepare_input($products_data['products_weight']), 'products_status' => $products_status, 'products_startpage' => xtc_db_prepare_input($products_data['products_startpage']), 'products_startpage_sort' => xtc_db_prepare_input($products_data['products_startpage_sort']), 'products_tax_class_id' => xtc_db_prepare_input($products_data['products_tax_class_id']), 'product_template' => xtc_db_prepare_input($products_data['info_template']), 'options_template' => xtc_db_prepare_input($products_data['options_template']), 'manufacturers_id' => xtc_db_prepare_input($products_data['manufacturers_id']), 'products_fsk18' => xtc_db_prepare_input($products_data['fsk18']), 'products_vpe_value' => xtc_db_prepare_input($products_data['products_vpe_value']), 'products_vpe_status' => xtc_db_prepare_input($products_data['products_vpe_status']), 'products_vpe' => xtc_db_prepare_input($products_data['products_vpe']), 'products_shippingclass' => xtc_db_prepare_input($products_data['products_shippingclass']));
+}}}
