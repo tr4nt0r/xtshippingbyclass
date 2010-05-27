@@ -15,7 +15,7 @@ Die Datei includes/modules/shipping/shippingclass.php bearbeiten und am Anfang b
 Anschließend über den Adminbereich unter _Module > Versandart_ das Modul Versand nach Versandklassen installieren, es wird automatisch in
 der Tabelle products in der Datenbank die Spalte products_shippingclass ergänzt.
 
-== Anpassung von Dateien ==
+==Anpassung von Dateien==
 
 Datei */admin/includes/modules/new_product.php* (Zeile 49)
 {{{
@@ -67,3 +67,63 @@ $sql_data_array = array ('products_quantity' => xtc_db_prepare_input($products_d
 {{{
 $sql_data_array = array ('products_quantity' => xtc_db_prepare_input($products_data['products_quantity']), 'products_model' => xtc_db_prepare_input($products_data['products_model']), 'products_ean' => xtc_db_prepare_input($products_data['products_ean']), 'products_price' => xtc_db_prepare_input($products_data['products_price']), 'products_sort' => xtc_db_prepare_input($products_data['products_sort']), 'products_shippingtime' => xtc_db_prepare_input($products_data['shipping_status']), 'products_discount_allowed' => xtc_db_prepare_input($products_data['products_discount_allowed']), 'products_date_available' => $products_date_available, 'products_weight' => xtc_db_prepare_input($products_data['products_weight']), 'products_status' => $products_status, 'products_startpage' => xtc_db_prepare_input($products_data['products_startpage']), 'products_startpage_sort' => xtc_db_prepare_input($products_data['products_startpage_sort']), 'products_tax_class_id' => xtc_db_prepare_input($products_data['products_tax_class_id']), 'product_template' => xtc_db_prepare_input($products_data['info_template']), 'options_template' => xtc_db_prepare_input($products_data['options_template']), 'manufacturers_id' => xtc_db_prepare_input($products_data['manufacturers_id']), 'products_fsk18' => xtc_db_prepare_input($products_data['fsk18']), 'products_vpe_value' => xtc_db_prepare_input($products_data['products_vpe_value']), 'products_vpe_status' => xtc_db_prepare_input($products_data['products_vpe_status']), 'products_vpe' => xtc_db_prepare_input($products_data['products_vpe']), 'products_shippingclass' => xtc_db_prepare_input($products_data['products_shippingclass']));
 }}}
+
+==Konfiguration der Versandklassen==
+
+Als erstes die erlaubten Versandzonen, die Steuerklasse (üblicherweise Standardsatz) und die Sortierreihenfolge einstellen.
+
+
+====Alle Versandklassen addieren====
+
+Diese Einstellung bewirkt, dass alle in den jeweiligen Versandklassen errechneten Versandkosten aufsummiert werden, wenn diese deaktiviert bleibt,
+wird anhand der höchsten Priorität die zu berechnende Versandklasse ermittelt.
+
+
+====Bezeichnung====
+
+Hier kann man der Versandklasse einen individuellen Namen geben, z.B. Großteil, Kleinteil oder A, B, C, dies wird dem Kunden
+in der Versandauswahl angezeigt.
+
+
+====Versandkosten====
+
+Hier können Länderabhängig die Versandkosten für die entsprechende Versandklasse definiert werden.
+Trennzeichen zwischen Ländern ist Semikolon ;
+Für jedes Land den ISO-2-Code verwenden, z.B. DE oder AT, für alle sonstigen Länder, die nicht explizit definiert wurden, kann 00 (2xNull)
+verwendet werden, dieses muss zwingend als letztes definiert werden.
+Trennzeichen zwischen Land und Versandkosten ist Doppelpunkt :
+Dezimaltrennzeichen für die Versandkosten ist Punkt, z.B: für 5,50€ wie folgt eingeben 5.50, um Rundungsdifferenzen mit der MwSt. zu vermeiden
+kann der Betrag auch mit 4 Nachkommastellen eingegeben werden.
+
+Beispiel:
+DE:4.35;AT:5.75;CH:12.00;00:20.00
+
+
+*Optional:* Staffelung nach Anzahl
+
+Um eine Staffelung zu deffinieren, gibt man anstatt dem Betrag direkt nach dem Doppelpunkt die Staffeln wie folgt ein:
+0,20.00|4,14.00|6,0.00
+
+Dies bedeutet ab 0 Stück 20€, ab 4 Stück 14€, ab 6 Stück keine Versandkosten in dieser Versandklasse.
+Der komplette einzugebende Wert sieht dann z.B. wie folgt aus:
+
+DE:0,20.00|4,14.00|6,0.00;AT:5.75;CH:12.00;00:20.00
+
+====Versandkostenfrei====
+
+Hier definiert man eine Versandkostenfreiheit für die entsprechende Versandklasse, d.h. übersteigt der Wert der Produkte aus dieser Versandklasse
+den definierten Wert, wird für diese Versandklasse kein Versand berechnet, werden die Versandklassen nicht summiert, und diese Versandklasse ist die
+mit der höchsten Priorität im Kundenwarenkorb ist die komplette Bestellung versandkostenfrei.
+
+
+====Prioriät====
+
+Hier werden die Prioritäten für die Versandklassen definiert, wobei 1 die höchste Priorität ist, dieser Wert muss über
+alle Versandklassen hinweg eindeutig sein. Wenn das aufsummieren der Versandklassen deaktiviert ist, werden nur die Versandkosten
+für die Artikel berechnet mit der höchsten Priorität im Warenkorb des Kunden.
+
+
+====Versandkosten addieren====
+
+Ist dies aktiviert, werden die Versandkosten aus dieser Versandklasse 1 x pro Artikel berechnet, d.h. bei 5 Artikeln aus dieser Versandklasse wird
+z.B. 5 x 4,35€ berechnet. Ist eine Staffelung vorhanden, z.B. ab 4 Stück 14€, wird dann 5x14€ berechnet.statt 20€.
