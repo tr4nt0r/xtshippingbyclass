@@ -34,7 +34,15 @@ class shippingclass {
 		 * CUSTOMIZE THIS SETTING FOR THE NUMBER OF SHIPPINGCLASSES NEEDED
 		 * 
 		 */
-		$this->num_classes = 3;
+		$this->num_classes = 4;
+		
+				
+		$this->types = array();
+		$products_shippingclass_query = xtc_db_query ('SELECT * FROM ' .TABLE_CONFIGURATION . ' WHERE configuration_key like "MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_%" ORDER BY configuration_value');
+		while( $products_shippingclass = xtc_db_fetch_array ($products_shippingclass_query)) {
+			$this->types[str_replace('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_', '', $products_shippingclass['configuration_key'])] = $products_shippingclass['configuration_value'];
+		}
+
 	}
 	
 	/**
@@ -44,22 +52,30 @@ class shippingclass {
 		global $order, $shipping_weight, $shipping_num_boxes;
 		
 		$dest_country = $order->delivery ['country'] ['iso_code_2'];
+		$dest_country_name = $order->delivery['country']['title'];		
 		$error = true;
 		
 		//Ermitteln welche Versandklassen die Artikel im Warenkorb haben
 		$products_available_classes = array ();
-		$highestpriority = null; //ID der Versandklasse mit der h�chsten Prioritt
+		$highestpriority = null; //ID der Versandklasse mit der höchsten Priorität
+
 		
 
 		foreach ( $order->products as $product ) {
-			$products_shippingclass_query = xtc_db_query ( 'SELECT products_shippingclass, products_weight FROM ' . TABLE_PRODUCTS . ' WHERE products_id = \'' . xtc_db_input ( $product ['id'] ) . '\'' );
+			$products_shippingclass_query = xtc_db_query ( 'SELECT products_shippingclass, products_weight, shipping_costs FROM ' . TABLE_PRODUCTS . ' WHERE products_id = \'' . xtc_db_input ( $product ['id'] ) . '\'' );
 			$products_shippingclass = xtc_db_fetch_array ( $products_shippingclass_query );
+			
+			if($products_shippingclass['shipping_costs']) {
+				$products_shippingclass ['products_shippingclass'] = 3;
+			}
+
 			if (defined ( 'MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_' . $products_shippingclass ['products_shippingclass'] )) {
 				$products_available_classes [$products_shippingclass ['products_shippingclass']] ['qty'] += $product ['qty'];
 				//TODO: Alternative Staffelung nach Gewicht oder Preis, statt Versandkostenfrei.
 				$products_available_classes [$products_shippingclass ['products_shippingclass']] ['weight'] += $products_shippingclass ['products_weight'];
 				$products_available_classes [$products_shippingclass ['products_shippingclass']] ['order_amount'] += $product ['price'];
 				
+
 				if ($highestpriority == null) {
 					//initialisieren
 					$highestpriority = $products_shippingclass ['products_shippingclass'];
@@ -68,9 +84,11 @@ class shippingclass {
 						$highestpriority = $products_shippingclass ['products_shippingclass'];
 					}
 				}
-				
-				$dest_table = split ( "[:;]", constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_COST_' . $products_shippingclass ['products_shippingclass'] ) );
-				
+				if($products_shippingclass['shipping_costs']) {
+					$dest_table = split("[:,]" , $products_shippingclass['shipping_costs']);
+				} else {
+					$dest_table = split ( "[:;]", constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_COST_' . $products_shippingclass ['products_shippingclass'] ) );
+				}
 				for($i = 0; $i < sizeof ( $dest_table ); $i += 2) {
 					if (strpos ( $dest_table [$i + 1], ',' ) !== false) {
 						$dest_table_scale = split ( "[,|]", $dest_table [$i + 1] );
@@ -88,47 +106,53 @@ class shippingclass {
 						} else {
 							$products_available_classes [$products_shippingclass ['products_shippingclass']] ['shipping_cost'] = floatval ( $current_shipping_cost );
 						}
-						
+						$error = false;
 						break;
 					}
 				}
-				$error = false;
 			}
 		}
 		
 		if (MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_CLASSES == 'True') {
 			$shipping_method_parts = array ();
 			$shipping_cost = 0;
+			$shipping_title = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_TITLE;
 			foreach ( $products_available_classes as $k => $values ) {
 				if ($this->get_free_amount( constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_' . $k ), $dest_country ) == 0 || $this->get_free_amount ( constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_' . $k ), $dest_country ) > $values ['order_amount']) {
 					$shipping_cost += $values ['shipping_cost'];
 					if (constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_' . $k ) == 'True') {
 						$shipping_method_parts [] = $values ['qty'] . ' x ' . constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_' . $k );
 					} else {
-						$shipping_method_parts [] = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_UNITS . ' ' . constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_' . $k );
+						$shipping_method_parts [] = '1 x ' . constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_' . $k );
 					}
 				}
 			
 			}
 			
-			$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY . ' ' . $dest_country . ' : ' . (($shipping_cost > 0) ? implode ( ', ', $shipping_method_parts ) : MODULE_SHIPPING_SHIPPINGCLASS_FREESHIPPING);
+			$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY . ' ' . $dest_country_name . ' : ' . (($shipping_cost > 0) ? implode ( ', ', $shipping_method_parts ) : MODULE_SHIPPING_SHIPPINGCLASS_FREESHIPPING);
 		
 		} else {
 			
 			if ($this->get_free_amount ( constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_' . $highestpriority ), $dest_country ) > 0 && $this->get_free_amount ( constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_' . $highestpriority ), $dest_country ) <= $products_available_classes [$highestpriority] ['order_amount']) {
 				$shipping_cost = 0;
-				$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY . ' ' . $dest_country . ' : ' . MODULE_SHIPPING_SHIPPINGCLASS_FREESHIPPING;
+				$shipping_title = MODULE_SHIPPING_SHIPPINGCLASS_FREESHIPPING;
+				$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY . ' ' . $dest_country_name;
 			} else {
-				if (constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_' . $highestpriority ) == 'True') {
-					$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY . ' ' . $dest_country . ' : ' . $products_available_classes [$highestpriority] ['qty'] . ' x ' . constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_' . $highestpriority );
+				$shipping_title = constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_' . $highestpriority );
+				if (constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_' . $highestpriority ) == 'True') {					
+					$shipping_method = $products_available_classes [$highestpriority] ['qty'] . ' x ' . ' ' . MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY . ' ' . $dest_country_name;
 				} else {
-					$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY . ' ' . $dest_country . ' : ' . MODULE_SHIPPING_SHIPPINGCLASS_TEXT_UNITS . ' ' . constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_' . $highestpriority );
+					$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY . ' ' . $dest_country_name;
 				}
 				$shipping_cost = $products_available_classes [$highestpriority] ['shipping_cost'];
 			}
 		}
 		
-		$this->quotes = array ('id' => $this->code, 'module' => MODULE_SHIPPING_SHIPPINGCLASS_TEXT_TITLE, 'methods' => array (array ('id' => $this->code, 'title' => $shipping_method, 'cost' => $shipping_cost ) ) );
+		if ($error == true) {
+			$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_UNDEFINED_RATE;
+			$shipping_cost = 0;
+		}
+		$this->quotes = array ('id' => $this->code, 'module' => $shipping_title, 'methods' => array (array ('id' => $highestpriority, 'title' => $shipping_method, 'cost' => $shipping_cost ) ) );
 		
 		if ($this->tax_class > 0) {
 			$this->quotes ['tax'] = xtc_get_tax_rate ( $this->tax_class, $order->delivery ['country'] ['id'], $order->delivery ['zone_id'] );
@@ -137,10 +161,48 @@ class shippingclass {
 		if (xtc_not_null ( $this->icon ))
 			$this->quotes ['icon'] = xtc_image ( $this->icon, $this->title );
 		
-		if ($error == true)
-			$this->quotes ['error'] = MODULE_SHIPPING_SHIPPINGCLASS_UNDEFINED_RATE;
+
 		
 		return $this->quotes;
+	}
+	
+	function get_shipping_cost ($product_id, $dest_country = STORE_COUNTRY, $products_price = 0) {
+		global $xtPrice;
+		
+		$products_shippingclass_query = xtc_db_query ( 'SELECT products_shippingclass, products_weight, shipping_costs, products_tax_class_id FROM ' . TABLE_PRODUCTS . ' WHERE products_id = \'' . xtc_db_input ( $product_id ) . '\'' );
+		$products_shippingclass = xtc_db_fetch_array ( $products_shippingclass_query );
+
+		if($products_shippingclass['shipping_costs']) {
+			$products_shippingclass ['products_shippingclass'] = 3;
+		}
+		
+		if($products_shippingclass['shipping_costs']) {
+			$dest_table = split("[:,]" , $products_shippingclass['shipping_costs']);
+		} else {
+			$dest_table = split ( "[:;]", constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_COST_' . $products_shippingclass ['products_shippingclass'] ) );
+		}
+		
+		for($i = 0; $i < sizeof ( $dest_table ); $i += 2) {
+			if (strpos ( $dest_table [$i + 1], ',' ) !== false) {
+				$dest_table_scale = split ( "[,|]", $dest_table [$i + 1] );
+				for($ii = 0; $ii < sizeof ( $dest_table_scale ); $ii += 2) {
+					if ($dest_table_scale [$ii] <= 1) {
+						$shipping_cost = floatval ( $dest_table_scale [$ii + 1] );
+					}
+				}
+			} else {
+				$shipping_cost = $dest_table [$i + 1];
+			}
+			if ($dest_country == $dest_table [$i] || $dest_table [$i] == '00') {
+				break;
+			}
+		}
+
+		if ($this->get_free_amount ( constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_' . $products_shippingclass ['products_shippingclass'] ), $dest_country ) > 0 && $this->get_free_amount ( constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_' . $products_shippingclass ['products_shippingclass'] ), $dest_country ) <= $products_price) {
+				$shipping_cost = 0;
+		}
+		
+		return $shipping_cost;
 	}
 	
 	function check() {
@@ -179,14 +241,15 @@ class shippingclass {
 		
 		}
 		xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, set_function, date_added) VALUES ('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_CLASSES', 'False', '6', '0', 'xtc_cfg_select_option(array(\'True\', \'False\'), ', now())" );
-		$products_structure_query = xtc_db_query ( 'SHOW columns FROM ' . TABLE_PRODUCTS . ' WHERe Field = "products_shippingclass"' );
-		if (! $products_structure = xtc_db_num_rows ( $products_structure_query )) {
+		/*$products_structure_query = xtc_db_query ( 'SHOW columns FROM ' . TABLE_PRODUCTS . ' WHERe Field = "products_shippingclass"' );
+		if (! $products_structure = xtc_db_num_rows ( $products_structure_query )) {*/
 			xtc_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' ADD products_shippingclass INT (11)' );
-		}
+		//}
 	}
 	
 	function remove() {
 		xtc_db_query ( "delete from " . TABLE_CONFIGURATION . " where configuration_key in ('" . implode ( "', '", $this->keys () ) . "')" );
+		xtc_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' DROP products_shippingclass' );
 	}
 	
 	function keys() {
@@ -221,4 +284,3 @@ class shippingclass {
 	}
 }
 ?>
-

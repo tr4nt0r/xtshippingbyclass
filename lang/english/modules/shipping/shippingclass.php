@@ -18,13 +18,13 @@
 // CUSTOMIZE THIS SETTING
 define('NUMBER_OF_CLASSES',10);
 
-define('MODULE_SHIPPING_SHIPPINGCLASS_TEXT_TITLE', 'Versand');
+define('MODULE_SHIPPING_SHIPPINGCLASS_TEXT_TITLE', 'Shipping');
 define('MODULE_SHIPPING_SHIPPINGCLASS_TEXT_DESCRIPTION', 'Versandkosten Versandklassenbasierend');
-define('MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY', 'Versand nach');
+define('MODULE_SHIPPING_SHIPPINGCLASS_TEXT_WAY', 'shipping to');
 define('MODULE_SHIPPING_SHIPPINGCLASS_TEXT_UNITS', '');
-define('MODULE_SHIPPING_SHIPPINGCLASS_INVALID_ZONE', 'Es ist kein Versand in dieses Land m&ouml;glich!');
-define('MODULE_SHIPPING_SHIPPINGCLASS_UNDEFINED_RATE', 'Leider konnten Ihre Lieferkosten nicht berechnet werden. Einer unserer Mitarbeiter wird sich nach &uuml;bermittlung Ihrer Bestellung schnellstm&ouml;glich mit Ihnen in Verbindung setzen und Ihnen die Versandosten mitteilen. Sie k&ouml;nnen uns dann Ihre Bestellung zum mitgeteilten Gesamtpreis best&auml;tigen.');
-define('MODULE_SHIPPING_SHIPPINGCLASS_FREESHIPPING', 'Versandkostenfrei');
+define('MODULE_SHIPPING_SHIPPINGCLASS_INVALID_ZONE', 'No shipping available to the selected country!');
+define('MODULE_SHIPPING_SHIPPINGCLASS_UNDEFINED_RATE', 'The shipping rate cannot be determined at this time. After submitting your order one of our employees will contanct you quickest possible and inform you about the shipping costs. You can then confirm or cancel your order.');
+define('MODULE_SHIPPING_SHIPPINGCLASS_FREESHIPPING', 'Free Shipping');
 
 define('MODULE_SHIPPING_SHIPPINGCLASS_STATUS_TITLE' , 'Versandkosten nach Zonen Methode aktivieren');
 define('MODULE_SHIPPING_SHIPPINGCLASS_STATUS_DESC' , 'M&ouml;chten Sie Versandkosten nach Zonen anbieten?');
