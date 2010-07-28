@@ -38,16 +38,16 @@ define('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_CLASSES_TITLE' , 'Alle Versandklas
 define('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_CLASSES_DESC' , 'Die errechneten Versandkosten aller Versandklassen werden miteinander addiert.');
 
 for ($ii=1;$ii<=NUMBER_OF_CLASSES;$ii++) {
-define('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Bezeichnung');
-define('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii.'_DESC' , 'Bezeichnung der Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' &auml;ndern.');
-define('MODULE_SHIPPING_SHIPPINGCLASS_COST_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Versandkosten');
-define('MODULE_SHIPPING_SHIPPINGCLASS_COST_'.$ii.'_DESC' , 'Versandkosten nach Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Bestimmungsorte. Beispiel: DE:2.95,AT:4.95,CH:14.95,00:19.95 . F&uuml;r alle &uuml;brigen L&auml;nder 00 als L&auml;ndercode verwenden.');
-define('MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Versandkostenfrei');
-define('MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_'.$ii.'_DESC' , 'Bestellwertgrenze f&uuml;r Versandkostenfreie Lieferung');
-define('MODULE_SHIPPING_SHIPPINGCLASS_PRIORITY_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Priorit&auml;t');
-define('MODULE_SHIPPING_SHIPPINGCLASS_PRIORITY_'.$ii.'_DESC' , 'Priorit&auml;t der Versandklasse vor anderen Versandklassen. (1 = h&ouml;chste Priorit&auml;t)');
-define('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Versandkosten addieren');
-define('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_'.$ii.'_DESC' , 'Die Versandkosten werden f&auml;r jeden Artikel in Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' berechnet, ansonsten nur einmal.');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Bezeichnung');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii.'_DESC' , 'Bezeichnung der Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' &auml;ndern.');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_COST_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Versandkosten');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_COST_'.$ii.'_DESC' , 'Versandkosten nach Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Bestimmungsorte. Beispiel: DE:2.95,AT:4.95,CH:14.95,00:19.95 . F&uuml;r alle &uuml;brigen L&auml;nder 00 als L&auml;ndercode verwenden.');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Versandkostenfrei');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_'.$ii.'_DESC' , 'Bestellwertgrenze f&uuml;r Versandkostenfreie Lieferung');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_PRIORITY_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Priorit&auml;t');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_PRIORITY_'.$ii.'_DESC' , 'Priorit&auml;t der Versandklasse vor anderen Versandklassen. (1 = h&ouml;chste Priorit&auml;t)');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_'.$ii.'_TITLE' , 'Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' Versandkosten addieren');
+	define('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_'.$ii.'_DESC' , 'Die Versandkosten werden f&auml;r jeden Artikel in Versandklasse ' . @constant('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_'.$ii) . ' berechnet, ansonsten nur einmal.');
 }
 
 ?>
