@@ -220,25 +220,37 @@ class shippingclass {
 		xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, date_added) values ('MODULE_SHIPPING_SHIPPINGCLASS_SORT_ORDER', '0', '6', '0', now())" );
 		xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, set_function, date_added) VALUES ('MODULE_SHIPPING_SHIPPINGCLASS_CALC_METHOD', 'False', '6', '0', 'xtc_cfg_select_option(array(\'True\', \'False\'), ', now())" );
 		for($i = 1; $i <= $this->num_classes; $i ++) {
-			$default_name = '';
+			$default_name = $i;
 			$default_costs = '';
 			$default_priority = 0;
+			$default_summate = 'False';
 			if ($i == 1) {
-				$default_name = 'A';
-				$default_costs = 'DE:2.1008;00:8.3193';
-				$default_priority = 2;
+				$default_name = 'Buchversand';
+				$default_costs = 'DE:1,2.1008|2,5.8403;BE:9.2436;NL:9.2436;LU:9.2436;BG:92.4369;DK:10.9243;EE:21.0084;LV:21.0084;LT:21.0084;FI:32.7731;FR:15.1260;GR:79.8319;GB:19.3277;IE:31.9327;IT:16.8067;MT:142.8571;NO:40.3361;AT:10.0840;PL:15.9663;PT:24.3697;RO:24.3697;SE:18.4873;CH:36.0000;SK:23.5294;SI:15.1260;ES:23.5294;CZ:13.4453;TR:91.5966;HU:17.6470;CY:91,5966';
+				$default_priority = 3;
 			}
 			if ($i == 2) {
-				$default_name = 'B';
-				$default_costs = 'DE:5.7983;00:16.7226';
+				$default_name = 'General Logistics Systems';
+				$default_costs = 'DE:5.8403;BE:9.2436;NL:9.2436;LU:9.2436;BG:92.4369;DK:10.9243;EE:21.0084;LV:21.0084;LT:21.0084;FI:32.7731;FR:15.1260;GR:79.8319;GB:19.3277;IE:31.9327;IT:16.8067;MT:142.8571;NO:40.3361;AT:10.0840;PL:15.9663;PT:24.3697;RO:24.3697;SE:18.4873;CH:36.0000;SK:23.5294;SI:15.1260;ES:23.5294;CZ:13.4453;TR:91.5966;HU:17.6470;CY:91,5966';
+				$default_priority = 2;
+			}
+			if ($i == 3) {
+				$default_name = 'Spedition';
+				$default_costs = 'DE:42.0168';
 				$default_priority = 1;
+				$default_summate = 'True';
+			}
+			if ($i == 4) {
+				$default_name = 'Versandkostenfrei';
+				$default_costs = '00:0';
+				$default_priority = 999;
 			}
 			xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, date_added) values ('MODULE_SHIPPING_SHIPPINGCLASS_ZONENAME_" . $i . "', '" . $default_name . "', '6', '0', now())" );
 			xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, date_added) values ('MODULE_SHIPPING_SHIPPINGCLASS_COST_" . $i . "', '" . $default_costs . "', '6', '0', now())" );
 			xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, date_added) values ('MODULE_SHIPPING_SHIPPINGCLASS_SHIPPINGFREEAMOUNT_" . $i . "', '0', '6', '0', now())" );
 			xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, date_added) values ('MODULE_SHIPPING_SHIPPINGCLASS_PRIORITY_" . $i . "', $default_priority, '6', '0', now())" );
-			xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, set_function, date_added) VALUES ('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_" . $i . "', 'False', '6', '0', 'xtc_cfg_select_option(array(\'True\', \'False\'), ', now())" );
-		
+			xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, set_function, date_added) VALUES ('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_" . $i . "', '".$default_summate."', '6', '0', 'xtc_cfg_select_option(array(\'True\', \'False\'), ', now())" );
+
 		}
 		xtc_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, set_function, date_added) VALUES ('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_CLASSES', 'False', '6', '0', 'xtc_cfg_select_option(array(\'True\', \'False\'), ', now())" );
 		/*$products_structure_query = xtc_db_query ( 'SHOW columns FROM ' . TABLE_PRODUCTS . ' WHERe Field = "products_shippingclass"' );
