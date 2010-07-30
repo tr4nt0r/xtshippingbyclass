@@ -64,7 +64,11 @@ class shippingclass {
 		foreach ( $order->products as $product ) {
 			$products_shippingclass_query = xtc_db_query ( 'SELECT products_shippingclass, products_weight, shipping_costs FROM ' . TABLE_PRODUCTS . ' WHERE products_id = \'' . xtc_db_input ( $product ['id'] ) . '\'' );
 			$products_shippingclass = xtc_db_fetch_array ( $products_shippingclass_query );
-			
+				
+			if(!$products_shippingclass['products_shippingclass']) {
+				$products_shippingclass ['products_shippingclass'] = 2;
+			}
+				
 			if($products_shippingclass['shipping_costs']) {
 				$products_shippingclass ['products_shippingclass'] = 3;
 			}
