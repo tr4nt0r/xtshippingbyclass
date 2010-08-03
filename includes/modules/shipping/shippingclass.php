@@ -53,7 +53,7 @@ class shippingclass {
 		
 		$dest_country = $order->delivery ['country'] ['iso_code_2'];
 		$dest_country_name = $order->delivery['country']['title'];		
-		$error = true;
+		$pass = array();
 		
 		//Ermitteln welche Versandklassen die Artikel im Warenkorb haben
 		$products_available_classes = array ();
@@ -110,7 +110,7 @@ class shippingclass {
 						} else {
 							$products_available_classes [$products_shippingclass ['products_shippingclass']] ['shipping_cost'] = floatval ( $current_shipping_cost );
 						}
-						$error = false;
+						$pass[$products_shippingclass['products_shippingclass']] = true;
 						break;
 					}
 				}
@@ -152,7 +152,7 @@ class shippingclass {
 			}
 		}
 		
-		if ($error == true) {
+		if (!isset($pass[$highestpriority]) || $pass[$highestpriority] != true) {
 			$shipping_method = MODULE_SHIPPING_SHIPPINGCLASS_UNDEFINED_RATE;
 			$shipping_cost = 0;
 		}
