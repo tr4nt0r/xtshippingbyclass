@@ -129,7 +129,7 @@ class shippingclass {
 						} else {
 							$products_available_classes [$products_shippingclass->fields ['products_shippingclass']] ['shipping_cost'] = floatval ( $current_shipping_cost );
 						}
-						$pass[$products_shippingclass['products_shippingclass']] = true;
+						$pass[$products_shippingclass->fields['products_shippingclass']] = true;
 						break;
 					}
 				}
