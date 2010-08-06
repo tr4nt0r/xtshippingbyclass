@@ -88,7 +88,7 @@ class shippingclass {
 				$products_shippingclass->fields['products_shippingclass'] = 2;
 			}
 			
-			if($products_shippingclass->fields['shipping_costs']) {
+			if($products_shippingclass->fields['products_shippingcosts']) {
 				$products_shippingclass->fields['products_shippingclass'] = 3;
 			}
 
@@ -107,8 +107,8 @@ class shippingclass {
 						$highestpriority = $products_shippingclass->fields ['products_shippingclass'];
 					}
 				}
-				if($products_shippingclass->fields['shipping_costs']) {
-					$dest_table = split("[:,]" , $products_shippingclass->fields['shipping_costs']);
+				if($products_shippingclass->fields['products_shippingcosts']) {
+					$dest_table = split("[:,]" , $products_shippingclass->fields['products_shippingcosts']);
 				} else {
 					$dest_table = split ( "[:;]", constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_COST_' . $products_shippingclass->fields ['products_shippingclass'] ) );
 				}
@@ -194,12 +194,16 @@ class shippingclass {
 		
 		$products_shippingclass = hhg_db_query ( $sql = 'SELECT products_shippingclass, products_weight, products_shippingcosts, products_tax_class_id FROM ' . TABLE_PRODUCTS . ' WHERE products_id = ' . (int) $product_id . '\'' );
 
-		if($products_shippingclass->fields['shipping_costs']) {
+		if(!$products_shippingclass->fields['products_shippingclass']) {
+			$products_shippingclass->fields ['products_shippingclass'] = 2;
+		}
+		
+		if($products_shippingclass->fields['products_shippingcosts']) {
 			$products_shippingclass->fields ['products_shippingclass'] = 3;
 		}
 		
-		if($products_shippingclass->fields['shipping_costs']) {
-			$dest_table = split("[:,]" , $products_shippingclass->fields['shipping_costs']);
+		if($products_shippingclass->fields['products_shippingcosts']) {
+			$dest_table = split("[:,]" , $products_shippingclass->fields['products_shippingcosts']);
 		} else {
 			$dest_table = split ( "[:;]", constant ( 'MODULE_SHIPPING_SHIPPINGCLASS_COST_' . $products_shippingclass->fields ['products_shippingclass'] ) );
 		}
