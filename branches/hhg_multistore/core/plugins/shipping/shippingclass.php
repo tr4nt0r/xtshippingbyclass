@@ -276,13 +276,13 @@ class shippingclass {
 		
 		}
 		hhg_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, set_function, date_added) VALUES ('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_CLASSES', 'False', '6', '0', 'xtc_cfg_select_option(array(\'True\', \'False\'), ', now())" );
-		hhg_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' ADD products_shippingclass INT (11), products_shippingcosts TEXT NOT NULL' );
+		hhg_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' ADD products_shippingclass INT (11), ADD products_shippingcosts TEXT NOT NULL' );
 
 	}
 	
 	function remove() {
 		hhg_db_query ( "delete from configuration_" . $this->store_id . "_modules where configuration_key in ('" . implode ( "', '", $this->keys () ) . "')" );
-		hhg_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' DROP products_shippingclass, products_shippingcosts' );
+		//hhg_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' DROP products_shippingclass, DROP products_shippingcosts' );
 	}
 	
 	function keys() {
