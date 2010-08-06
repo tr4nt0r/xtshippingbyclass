@@ -276,7 +276,13 @@ class shippingclass {
 		
 		}
 		hhg_db_query ( "insert into " . TABLE_CONFIGURATION . " (configuration_key, configuration_value, configuration_group_id, sort_order, set_function, date_added) VALUES ('MODULE_SHIPPING_SHIPPINGCLASS_SUMMATE_CLASSES', 'False', '6', '0', 'xtc_cfg_select_option(array(\'True\', \'False\'), ', now())" );
-		hhg_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' ADD products_shippingclass INT (11), ADD products_shippingcosts TEXT NOT NULL' );
+		if(!$this->column_exists('products_shippingclass', TABLE_PRODUCTS )) {
+			hhg_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' ADD products_shippingclass INT (11)' );
+		}
+
+		if(!$this->column_exists('products_shippingcosts', TABLE_PRODUCTS )) {
+			hhg_db_query ( 'ALTER TABLE ' . TABLE_PRODUCTS . ' ADD products_shippingcosts TEXT NOT NULL' );
+		}
 
 	}
 	
@@ -313,6 +319,17 @@ class shippingclass {
 			if ($dest_country == $dest_table [$i] || $dest_table [$i] == '00') {
 						return floatval($dest_table [$i + 1]);
 			}
+		}
+	}
+	
+	private function column_exists($column, $table) {
+		global $db;
+		
+		$check_columns = $db->MetaColumnNames($table,true);		
+		if(in_array($column, $check_columns)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }
